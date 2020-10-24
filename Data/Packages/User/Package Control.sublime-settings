@@ -1,0 +1,20 @@
+{
+	"auto_upgrade": true,
+	"auto_upgrade_ignore":
+	[
+		"A File Icon",
+		"SideBarEnhancements",
+		"Theme - Soda"
+	],
+	"bootstrapped": true,
+	"in_process_packages":
+	[
+	],
+	"installed_packages":
+	[
+		"A File Icon",
+		"Package Control",
+		"SideBarEnhancements",
+		"Theme - Soda"
+	]
+}
