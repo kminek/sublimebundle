@@ -36,8 +36,10 @@ directories by double-clicking file `install_context_menu_shortcuts.reg`.
 
 ```
 "A File Icon",
-"Package Control",
+"Dockerfile Syntax Highlighting",
+"EditorConfig",
+"INI",
+"nginx",
 "SideBarEnhancements",
 "Theme - Soda"
 ```
-

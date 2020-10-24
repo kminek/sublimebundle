@@ -3,6 +3,10 @@
 	"auto_upgrade_ignore":
 	[
 		"A File Icon",
+		"Dockerfile Syntax Highlighting",
+		"EditorConfig",
+		"INI",
+		"nginx",
 		"SideBarEnhancements",
 		"Theme - Soda"
 	],
@@ -13,6 +17,10 @@
 	"installed_packages":
 	[
 		"A File Icon",
+		"Dockerfile Syntax Highlighting",
+		"EditorConfig",
+		"INI",
+		"nginx",
 		"Package Control",
 		"SideBarEnhancements",
 		"Theme - Soda"
