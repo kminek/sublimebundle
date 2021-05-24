@@ -16,7 +16,7 @@
 	[
 		{
 			"characters": "<",
-			"selector": "text.html"
+			"selector": "text.html",
 		}
 	],
 	"auto_complete_with_fields": false,
@@ -88,7 +88,7 @@
 	"hot_exit": false,
 	"ignored_packages":
 	[
-		"Vintage"
+		"Vintage",
 	],
 	"indent_guide_options":
 	[
@@ -156,5 +156,5 @@
 	"use_tab_stops": true,
 	"word_separators": "./\\()\"'-:,.;<>~!@#$%^&*|+=[]{}`~?",
 	"word_wrap": false,
-	"wrap_width": 0
+	"wrap_width": 0,
 }
