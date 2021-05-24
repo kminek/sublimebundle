@@ -30,12 +30,13 @@ directories by double-clicking file `install_context_menu_shortcuts.reg`.
 
 ## What's included
 
-- Sublime Text Version ***3.2.2***, Build ***3.2.1***
+- Sublime Text Version ***4***, Build ***4107***
 
 ### Packages
 
 ```
 "A File Icon",
+"DotENV"
 "Dockerfile Syntax Highlighting",
 "EditorConfig",
 "INI",
