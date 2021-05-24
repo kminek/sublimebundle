@@ -79,7 +79,7 @@
 	"font_options":
 	[
 	],
-	"font_size": 9,
+	"font_size": 10,
 	"git_diff_target": "index",
 	"gpu_window_buffer": "auto",
 	"gutter": true,
