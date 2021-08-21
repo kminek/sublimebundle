@@ -18,13 +18,14 @@
 	"installed_packages":
 	[
 		"A File Icon",
-		"DotENV",
 		"Dockerfile Syntax Highlighting",
+		"DotENV",
 		"EditorConfig",
 		"INI",
 		"nginx",
 		"Package Control",
 		"SideBarEnhancements",
-		"Theme - Soda"
+		"Terraform",
+		"Theme - Soda",
 	],
 }
