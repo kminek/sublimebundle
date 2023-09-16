@@ -52,7 +52,7 @@
 	"default_encoding": "UTF-8",
 	"default_line_ending": "unix",
 	"detect_indentation": true,
-	"dictionary": "Packages/Language - English/en_US.dic",
+	"dictionary": "Packages/Language - Polish/pl_PL.dic",
 	"drag_text": true,
 	"draw_centered": false,
 	"draw_indent_guides": true,
