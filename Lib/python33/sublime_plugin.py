@@ -1182,6 +1182,9 @@ class CommandInputHandler():
     def initial_text(self):
         return ""
 
+    def initial_selection(self):
+        return []
+
     def preview(self, arg):
         return ""
 
@@ -1237,6 +1240,7 @@ class TextInputHandler(CommandInputHandler):
     def setup_(self, args):
         props = {
             "initial_text": self.initial_text(),
+            "initial_selection": self.initial_selection(),
             "placeholder_text": self.placeholder(),
             "type": "text",
         }
@@ -1295,6 +1299,7 @@ class ListInputHandler(CommandInputHandler):
 
         props = {
             "initial_text": self.initial_text(),
+            "initial_selection": self.initial_selection(),
             "placeholder_text": self.placeholder(),
             "selected": selected_item_index,
             "type": "list",

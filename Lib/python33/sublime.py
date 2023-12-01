@@ -256,10 +256,11 @@ def open_dialog(callback, file_types=[], directory=None, multi_select=False, all
     if allow_folders:
         flags |= 2
 
-    cb = callback
     if not multi_select:
         def cb(files):
             return callback(files[0] if files else None)
+    else:
+        cb = callback
 
     sublime_api.open_dialog(file_types, directory or '', flags, cb)
 
@@ -289,12 +290,26 @@ def select_folder_dialog(callback, directory=None, multi_select=False):
     multi_select: bool - Whether to allow selecting multiple folders. Function
                          will call callback with a list if this is True.
     """
-    cb = callback
     if not multi_select:
         def cb(folders):
             return callback(folders[0] if folders else None)
+    else:
+        cb = callback
 
     sublime_api.select_folder_dialog(directory or '', multi_select, cb)
+
+
+def choose_font_dialog(callback, default=None):
+    font_face = ''
+    font_size = None
+    if default is not None:
+        font_face = default.get("font_face") or ""
+        try:
+            font_size = int(default.get("font_size"))
+        except ValueError:
+            font_size = None
+
+    sublime_api.choose_font_dialog(callback, font_face, font_size)
 
 
 def run_command(cmd, args=None):
@@ -453,8 +468,8 @@ def find_resources(pattern):
     return sublime_api.find_resources(pattern)
 
 
-def encode_value(val, pretty=False):
-    return sublime_api.encode_value(val, pretty)
+def encode_value(val, pretty=False, update_text=None):
+    return sublime_api.encode_value(val, pretty, update_text)
 
 
 def decode_value(data):

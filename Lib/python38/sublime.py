@@ -10,7 +10,7 @@ import json
 import sys
 import io
 import enum
-from typing import Callable, Optional, Any, Iterator, Literal, TYPE_CHECKING
+from typing import Callable, Optional, Any, Iterator, Iterable, Literal, TYPE_CHECKING
 
 import sublime_api
 
@@ -867,10 +867,11 @@ def open_dialog(
     if allow_folders:
         flags |= 2
 
-    cb = callback
     if not multi_select:
         def cb(files):
             return callback(files[0] if files else None)
+    else:
+        cb = callback
 
     sublime_api.open_dialog(file_types, directory or '', flags, cb)
 
@@ -912,12 +913,38 @@ def select_folder_dialog(
     :param multi_select: Whether to allow selecting multiple files. When ``True``
                          the callback will be called with a list.
     """
-    cb = callback
     if not multi_select:
         def cb(folders):
             return callback(folders[0] if folders else None)
+    else:
+        cb = callback
 
     sublime_api.select_folder_dialog(directory or '', multi_select, cb)
+
+
+def choose_font_dialog(callback: Callable[[Value], None], default: Value = None):
+    """
+    Show a dialog for selecting a font.
+
+    .. since:: 4157
+
+    :param callback: Called with the font options, matching the format used in
+                     settings (eg. ``{ "font_face": "monospace" }``). May be
+                     called more than once, or will be called with ``None`` if
+                     the dialog is cancelled.
+    :param default: The default values to select/return. Same format as the
+                    argument passed to `callback`.
+    """
+    font_face = ''
+    font_size = None
+    if default is not None:
+        font_face = default.get("font_face") or ""
+        try:
+            font_size = int(default.get("font_size"))
+        except ValueError:
+            font_size = None
+
+    sublime_api.choose_font_dialog(callback, font_face, font_size)
 
 
 def run_command(cmd: str, args: CommandArgs = None):
@@ -1192,13 +1219,20 @@ def find_resources(pattern: str) -> list[str]:
     return sublime_api.find_resources(pattern)
 
 
-def encode_value(value: Value, pretty=False) -> str:
+def encode_value(value: Value, pretty=False, update_text: str = None) -> str:
     """
     Encode a JSON compatible `Value` into a string representation.
 
     :param pretty: Whether the result should include newlines and be indented.
+    :param update_text:
+        Incrementally update the value encoded in this text. Best effort is made
+        to preserve the contents of ``update_text`` - comments, indentation,
+        etc. This is the same algorithm used to change settings values.
+        Providing this makes ``pretty`` have no effect.
+
+        .. since:: next
     """
-    return sublime_api.encode_value(value, pretty)
+    return sublime_api.encode_value(value, pretty, update_text)
 
 
 def decode_value(data: str) -> Value:
@@ -1286,7 +1320,7 @@ def get_macro() -> list[dict]:
     return sublime_api.get_macro()
 
 
-def project_history():
+def project_history() -> list[str]:
     """
     :returns: A list of most recently opened workspaces.
               Sublime-project files with the same name are
@@ -1297,7 +1331,7 @@ def project_history():
     return sublime_api.project_history()
 
 
-def folder_history():
+def folder_history() -> list[str]:
     """
     :returns: A list of recent folders added to sublime projects
 
@@ -1554,7 +1588,7 @@ class Window:
         """
         .. since:: 4083
 
-        :returns: All selected sheets in the window.
+        :returns: All selected sheets in the window's currently selected group.
         """
         sheet_ids = sublime_api.window_selected_sheets(self.window_id)
         return [make_sheet(s) for s in sheet_ids]
@@ -2297,7 +2331,7 @@ class Selection:
         else:
             sublime_api.view_selection_add_point(self.view_id, x)
 
-    def add_all(self, regions: Iterator[Region]):
+    def add_all(self, regions: Iterable[Region | Point]):
         """ Add all the regions from the given iterable. """
         for r in regions:
             self.add(r)
@@ -2391,7 +2425,11 @@ class Sheet:
 
     def is_transient(self) -> bool:
         """
-        :returns: Whether this sheet is transient.
+        :returns:
+            Whether this sheet is exclusively transient.
+
+            Note that a sheet may be both open as a regular file and be
+            transient. In this case `is_transient` will still return ``False``.
 
         .. since:: 4080
         """
@@ -3857,7 +3895,7 @@ class PhantomSet:
     def __repr__(self) -> str:
         return f'PhantomSet({self.view!r}, key={self.key!r})'
 
-    def update(self, phantoms: Iterator[Phantom]):
+    def update(self, phantoms: Iterable[Phantom]):
         """
         Update the set of phantoms. If the `Phantom.region` of existing phantoms
         have changed they will be moved; new phantoms are added and ones not

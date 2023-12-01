@@ -59,6 +59,77 @@ html.dark tt {
 <h1>Stable Channel Changelog</h1>
 
 <article class="current">
+<h2>Build 4169</h2>
+<div class="release-date">24 November 2023</div>
+<ul>
+    <li>Fixed a stack overflow when closing large amounts of files</li>
+    <li>API: Fixed backwards compatibility breakage with <tt>Sheet.is_transient()</tt></li>
+    <li>API: Fixed a crash with <tt>Window.set_view_index</tt></li>
+    <li>Linux: Fixed a rare crash with the save dialog</li>
+    <li>Windows: Fixed a rare crash related to cursor hiding</li>
+</ul>
+</article>
+
+<article>
+<h2>Build 4166</h2>
+<div class="release-date">20 November 2023</div>
+<ul>
+    <li>Various syntax highlighting improvements</li>
+    <li>Index collation is now done incrementally</li>
+    <li>Fixed an issue where animations were causing excessive redraws</li>
+    <li>Find in files now truncates long lines according to the <tt>"find_in_files_context_characters"</tt> setting</li>
+    <li>Fixed auto-complete not suggesting tokens from the current line</li>
+    <li>Added <i>Mouse Bindings</i> to the <i>Preferences</i> menu</li>
+    <li>Added <i>Preferences > Font > Choose…</i> for an easy way to select a font</li>
+    <li>Added <i>Copy Path</i> to Sidebar context menu</li>
+    <li>Fixed minimap border not rendering</li>
+    <li>Fixed color emoji blending with transparency</li>
+    <li>Fixed line-number alignment when using a variable-width font</li>
+    <li>Fixed double clicking a find in file result sometimes scrolling to the wrong line in the file</li>
+    <li>Fixed case where opening a file from Sublime Merge wouldn't jump to the right line</li>
+    <li>Improved bookmark toggling</li>
+    <li>Improved performance of "Definitions" popup</li>
+    <li>Improved <i>Join Lines</i> behavior</li>
+    <li>Improved behavior of Indent command on empty lines</li>
+    <li>Added <tt>"ruler_width"</tt> setting</li>
+    <li>Added <tt>current_result</tt> command</li>
+    <li>Fixed case conversions not taking all-caps into account</li>
+    <li>Fixed an auto-indent issue</li>
+    <li>Fixed an issue with <tt>find_under_expand</tt> when the find panel is focused</li>
+    <li>Fixed disabling <tt>"highlight_gutter"</tt> resulting in <tt>"highlight_line"</tt> begin disabled</li>
+    <li>Fixed some incorrect behavior when converting a multi-line selection to Title Case</li>
+    <li>Fixed a memory corruption bug related to block carets</li>
+    <li>Fixed <i>Quick Switch Project…</i> from the settings window closing the window</li>
+    <li>Fixed <tt>"move_to_limit_on_up_down"</tt> setting not working</li>
+    <li><i>Shift+Enter</i> now also hides the incremental find panel</li>
+    <li>Fixed macro recording in Vintage package not working</li>
+    <li>Updated to OpenSSL 1.1.1v</li>
+    <li>Fixed <tt>run_syntax_tests</tt> command not running symbol tests</li>
+    <li>API: Added <tt>sublime.choose_font_dialog</tt></li>
+    <li>API: Allow case insensitive comments using <tt>TM_COMMENT_CASE_INSENSITIVE</tt></li>
+    <li>API: Fixed instability related to overlapping API calls</li>
+    <li>API: Fixed crash when an edit token is passed to the wrong view</li>
+    <li>API: Fixed some issues related to plugin initialization</li>
+    <li>API: <tt>ListInputHandler</tt> now supports <tt>initial_selection</tt></li>
+    <li>API: Fixed <tt>ListInputHandler</tt> not selecting the first result when <tt>initial_text</tt> is provided</li>
+    <li>API: Added <tt>update_text</tt> option to <tt>sublime.encode_value</tt></li>
+    <li>API: Fixed <tt>expand_to_paragraph</tt> in <tt>paragraph.py</tt> incorrectly unpacking tuple</li>
+    <li>Linux: Improved tracking of fullscreen state</li>
+    <li>Linux: Fixed some memory leaks related to fonts</li>
+    <li>Linux: Fixed <tt>"ui_scale"</tt> setting not being applied to fonts correctly in some cases</li>
+    <li>Windows: Added CRLF handling for text drag an drop</li>
+    <li>Windows: Fixed wrong font extents causing glyphs to be cut off at the top</li>
+    <li>Windows: Fixed caret movement across phantoms when using fractional scaling</li>
+    <li>Mac: Improved animation frame timing</li>
+    <li>Mac: Implemented window cascading</li>
+    <li>Mac: Recent files are now cleared when <tt>"update_system_recent_files"</tt> is disabled</li>
+    <li>Mac: Fixed <i>Copy as HTML</i> not working</li>
+    <li>Mac: Fixed <tt>subl</tt> not always finding the correct application bundle</li>
+    <li>Mac: Fixed <tt>"regex_auto_escape"</tt> not working</li>
+</ul>
+</article>
+
+<article>
 <h2>Build 4152</h2>
 <div class="release-date">2 August 2023</div>
 <ul>

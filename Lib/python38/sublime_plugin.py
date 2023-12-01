@@ -1432,6 +1432,7 @@ class ListInputHandler(CommandInputHandler):
 
         props = {
             "initial_text": self.initial_text(),
+            "initial_selection": self.initial_selection(),
             "placeholder_text": self.placeholder(),
             "selected": selected_item_index,
             "type": "list",
