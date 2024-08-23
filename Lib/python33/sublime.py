@@ -1541,6 +1541,16 @@ class View():
     def text_point_utf16(self, row, col_utf16, *, clamp_column=False):
         return sublime_api.view_text_point_utf16(self.view_id, row, col_utf16, clamp_column)
 
+    def utf8_code_units(self, tp=None):
+        if tp is not None:
+            return sublime_api.view_code_units_at(self.view_id, tp)[0]
+        return sublime_api.view_total_code_units(self.view_id)[0]
+
+    def utf16_code_units(self, tp=None):
+        if tp is not None:
+            return sublime_api.view_code_units_at(self.view_id, tp)[1]
+        return sublime_api.view_total_code_units(self.view_id)[1]
+
     def visible_region(self):
         """ Returns the approximate visible region """
         return sublime_api.view_visible_region(self.view_id)

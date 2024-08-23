@@ -922,7 +922,7 @@ def select_folder_dialog(
     sublime_api.select_folder_dialog(directory or '', multi_select, cb)
 
 
-def choose_font_dialog(callback: Callable[[Value], None], default: Value = None):
+def choose_font_dialog(callback: Callable[[Value], None], default: dict[str, Value] = None):
     """
     Show a dialog for selecting a font.
 
@@ -935,12 +935,12 @@ def choose_font_dialog(callback: Callable[[Value], None], default: Value = None)
     :param default: The default values to select/return. Same format as the
                     argument passed to `callback`.
     """
-    font_face = ''
-    font_size = None
+    font_face: Value = ''
+    font_size: Value = None
     if default is not None:
         font_face = default.get("font_face") or ""
         try:
-            font_size = int(default.get("font_size"))
+            font_size = int(default.get("font_size"))  # type: ignore
         except ValueError:
             font_size = None
 
@@ -1230,7 +1230,7 @@ def encode_value(value: Value, pretty=False, update_text: str = None) -> str:
         etc. This is the same algorithm used to change settings values.
         Providing this makes ``pretty`` have no effect.
 
-        .. since:: next
+        .. since:: 4156
     """
     return sublime_api.encode_value(value, pretty, update_text)
 
@@ -2018,7 +2018,7 @@ class Edit:
     `View`, will cause the functions that require them to fail.
     """
 
-    def __init__(self, token):
+    def __init__(self, token: int):
         self.edit_token: int = token
 
     def __repr__(self) -> str:
@@ -2191,7 +2191,7 @@ class HistoricPosition:
 
     __slots__ = ['pt', 'row', 'col', 'col_utf16', 'col_utf8']
 
-    def __init__(self, pt, row, col, col_utf16, col_utf8):
+    def __init__(self, pt: Point, row: int, col: int, col_utf16: int, col_utf8: int):
         self.pt: Point = pt
         """ The offset from the beginning of the `View`. """
         self.row: int = row
@@ -2227,7 +2227,7 @@ class TextChange:
 
     __slots__ = ['a', 'b', 'len_utf16', 'len_utf8', 'str']
 
-    def __init__(self, pa, pb, len_utf16, len_utf8, str):
+    def __init__(self, pa: HistoricPosition, pb: HistoricPosition, len_utf16: int, len_utf8: int, s: str):
         self.a: HistoricPosition = pa
         """ The beginning `HistoricPosition` of the region that was modified. """
         self.b: HistoricPosition = pb
@@ -2244,7 +2244,7 @@ class TextChange:
 
         .. since:: 4075
         """
-        self.str: str = str
+        self.str: str = s
         """
         A string of the *new* contents of the region specified by ``.a`` and ``.b``.
 
@@ -2520,7 +2520,7 @@ class ContextStackFrame:
 
     __slots__ = ['context_name', 'source_file', 'source_location']
 
-    def __init__(self, context_name, source_file, source_location):
+    def __init__(self, context_name: str, source_file: str, source_location: tuple[int, int]):
         self.context_name: str = context_name
         """ The name of the context. """
         self.source_file: str = source_file
@@ -2984,26 +2984,27 @@ class View:
         """
         return sublime_api.view_style(self.view_id)
 
-    def style_for_scope(self, scope: str) -> dict[str, str]:
+    def style_for_scope(self, scope: str) -> dict[str, Value]:
         """
         Accepts a string scope name and returns a ``dict`` of style information
         including the keys:
 
-        * ``"foreground"``
-        * ``"background"`` (only if set)
-        * ``"bold"``
-        * ``"italic"``
+        * ``"foreground": str``
+        * ``"selection_foreground": str`` (only if set)
+        * ``"background": str`` (only if set)
+        * ``"bold": bool``
+        * ``"italic": bool``
         * .. since:: 4063
-            ``"glow"``
+            ``"glow": bool`` (only if set)
         * .. since:: 4075
-            ``"underline"``
+            ``"underline": bool`` (only if set)
         * .. since:: 4075
-            ``"stippled_underline"``
+            ``"stippled_underline": bool`` (only if set)
         * .. since:: 4075
-            ``"squiggly_underline"``
-        * ``"source_line"``
-        * ``"source_column"``
-        * ``"source_file"``
+            ``"squiggly_underline": bool`` (only if set)
+        * ``"source_line": str``
+        * ``"source_column": int``
+        * ``"source_file": int``
 
         The foreground and background colors are normalized to the six character
         hex form with a leading hash, e.g. ``#ff0000``.
@@ -3161,6 +3162,34 @@ class View:
             ``row``. :since:`4075`
         """
         return sublime_api.view_text_point_utf16(self.view_id, row, col, clamp_column)
+
+    def utf8_code_units(self, tp: Point = None) -> int:
+        """
+        Calculates the utf8 code unit offset at the given text point.
+
+        .. since:: 4173
+
+        :param tp:
+            The text point up to which code units should be counted. If not
+            provided the total is returned.
+        """
+        if tp is not None:
+            return sublime_api.view_code_units_at(self.view_id, tp)[0]
+        return sublime_api.view_total_code_units(self.view_id)[0]
+
+    def utf16_code_units(self, tp: Point = None) -> int:
+        """
+        Calculates the utf16 code unit offset at the given text point.
+
+        .. since:: 4173
+
+        :param tp:
+            The text point up to which code units should be counted. If not
+            provided the total is returned.
+        """
+        if tp is not None:
+            return sublime_api.view_code_units_at(self.view_id, tp)[1]
+        return sublime_api.view_total_code_units(self.view_id)[1]
 
     def visible_region(self) -> Region:
         """ :returns: The currently visible area of the view. """
@@ -3831,7 +3860,7 @@ class Phantom:
     the `View`, changes to the attributes will have no effect.
     """
 
-    def __init__(self, region, content, layout, on_navigate=None):
+    def __init__(self, region: Region, content: str, layout: PhantomLayout, on_navigate: Callable[[str], None] = None):
         self.region: Region = region
         """
         The `Region` associated with the phantom. The phantom is displayed at
@@ -3846,7 +3875,7 @@ class Phantom:
         Called when a link in the HTML is clicked. The value of the ``href``
         attribute is passed.
         """
-        self.id = None
+        self.id: int | None = None
 
     def __eq__(self, rhs: object) -> bool:
         # Note that self.id is not considered
@@ -3875,7 +3904,7 @@ class PhantomSet:
     updating them and removing them from a `View`.
     """
 
-    def __init__(self, view, key=""):
+    def __init__(self, view: View, key=""):
         """
         """
         self.view: View = view
@@ -3886,7 +3915,7 @@ class PhantomSet:
         """
         A string used to group the phantoms together.
         """
-        self.phantoms: [Phantom] = []
+        self.phantoms: list[Phantom] = []
 
     def __del__(self):
         for p in self.phantoms:
@@ -3905,7 +3934,7 @@ class PhantomSet:
 
         # Update the list of phantoms that exist in the text buffer with their
         # current location
-        regions = self.view.query_phantoms([p.id for p in self.phantoms])
+        regions = self.view.query_phantoms([p.id for p in self.phantoms])  # type: ignore
         for phantom, region in zip(self.phantoms, regions):
             phantom.region = region
 
@@ -3925,7 +3954,7 @@ class PhantomSet:
             # if the region is -1, then it's already been deleted, no need to
             # call erase
             if p.id not in new_phantom_ids and p.region != Region(-1):
-                self.view.erase_phantom_by_id(p.id)
+                self.view.erase_phantom_by_id(p.id)  # type: ignore
 
         self.phantoms = [p for p in new_phantoms.values()]
 
@@ -3938,7 +3967,7 @@ class Html:
 
     __slots__ = ['data']
 
-    def __init__(self, data):
+    def __init__(self, data: str):
         self.data: str = data
 
     def __repr__(self) -> str:
@@ -4007,7 +4036,7 @@ class CompletionItem:
 
     def __init__(
             self,
-            trigger,
+            trigger: str,
             annotation="",
             completion="",
             completion_format=CompletionFormat.TEXT,
@@ -4164,7 +4193,7 @@ class Syntax:
 
     __slots__ = ['path', 'name', 'hidden', 'scope']
 
-    def __init__(self, path, name, hidden, scope):
+    def __init__(self, path: str, name: str, hidden: bool, scope: str):
         self.path: str = path
         """ The packages path to the syntax file. """
         self.name: str = name
@@ -4194,7 +4223,7 @@ class QuickPanelItem:
 
     __slots__ = ['trigger', 'details', 'annotation', 'kind']
 
-    def __init__(self, trigger, details="", annotation="", kind=KIND_AMBIGUOUS):
+    def __init__(self, trigger: str, details="", annotation="", kind=KIND_AMBIGUOUS):
         self.trigger: str = trigger
         """ Text to match against user's input. """
         self.details: str | list[str] | tuple[str] = details
@@ -4222,7 +4251,7 @@ class ListInputItem:
 
     __slots__ = ['text', 'value', 'details', 'annotation', 'kind']
 
-    def __init__(self, text, value, details="", annotation="", kind=KIND_AMBIGUOUS):
+    def __init__(self, text: str, value: Any, details="", annotation="", kind=KIND_AMBIGUOUS):
         self.text: str = text
         """ Text to match against the user's input. """
         self.value: Any = value
@@ -4253,7 +4282,7 @@ class SymbolRegion:
 
     __slots__ = ['name', 'region', 'syntax', 'type', 'kind']
 
-    def __init__(self, name, region, syntax, type, kind):
+    def __init__(self, name: str, region: Region, syntax: str, type: SymbolType, kind: Kind):
         self.name: str = name
         """ The name of the symbol. """
         self.region: Region = region
@@ -4280,7 +4309,7 @@ class SymbolLocation:
 
     __slots__ = ['path', 'display_name', 'row', 'col', 'syntax', 'type', 'kind']
 
-    def __init__(self, path, display_name, row, col, syntax, type, kind):
+    def __init__(self, path: str, display_name: str, row: int, col: int, syntax: str, type: SymbolType, kind: Kind):
         self.path: str = path
         """ The filesystem path to the file containing the symbol. """
         self.display_name: str = display_name
