@@ -59,6 +59,41 @@ html.dark tt {
 <h1>Stable Channel Changelog</h1>
 
 <article class="current">
+<h2>Build 4186</h2>
+<div class="release-date">17 Dec 2024</div>
+<ul>
+    <li>Various syntax highlighting improvements</li>
+    <li>Fixed file change detection not working for cloned views after the original is closed</li>
+    <li>Fixed prompting to reload right after reloading</li>
+    <li>Fixed find-in-files results not always being sorted</li>
+    <li>Significantly improved cache compression performance</li>
+    <li>Improved performance of custom regex engine used for syntax highlighting</li>
+    <li>Reduced syntax engine memory usage under certain conditions</li>
+    <li>Improved git repository scanning performance</li>
+    <li>Improved rendering performance by making theming faster</li>
+    <li>Added <tt>unselect_current</tt> command for tab multi-selection</li>
+    <li>Fixed tab order getting reversed when a group is closed</li>
+    <li>Fixed regression in Goto Definition where symbols in the current file weren't prioritized</li>
+    <li>Fixed caret location swapping sides when indenting</li>
+    <li>Fixed symbol icons missing in some cases</li>
+    <li>Fixed <tt>find_under_expand_skip</tt> clearing the selection when there's only one occurrence</li>
+    <li>Syntax test error messages have been reworked</li>
+    <li>Syntax tests can now test for symbol transformations</li>
+    <li>Fixed syntax engine getting confused with multiple overlapping branches</li>
+    <li>Fixed transformed symbols having an incorrect region</li>
+    <li>minihtml can now load images from the internet</li>
+    <li>API: Fixed <tt>on_post_move</tt> not being triggered when air-dropping</li>
+    <li>API: <tt>CompletionList.set_completions</tt> is now thread safe</li>
+    <li>API: Improved performance when handling many completions</li>
+    <li>API: <tt>View.find_all</tt> now supports limiting search to a specified region(s)</li>
+    <li>API: Fixed null characters truncating log messages</li>
+    <li>Windows: Fixed crash caused by various Anti-Virus programs calling CreateRemoteThread</li>
+    <li>Mac: Fixed find clipboard not updating under certain conditions</li>
+    <li>Mac: Fixed click-through not working</li>
+</ul>
+</article>
+
+<article>
 <h2>Build 4180</h2>
 <div class="release-date">6 Aug 2024</div>
 <ul>

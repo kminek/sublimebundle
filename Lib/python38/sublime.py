@@ -2863,8 +2863,12 @@ class View:
         """
         return sublime_api.view_find(self.view_id, pattern, start_pt, flags)
 
-    def find_all(self, pattern: str, flags=FindFlags.NONE, fmt: Optional[str] = None,
-                 extractions: Optional[list[str]] = None) -> list[Region]:
+    def find_all(self,
+                 pattern: str,
+                 flags=FindFlags.NONE,
+                 fmt: Optional[str] = None,
+                 extractions: Optional[list[str]] = None,
+                 within: Optional[Region | list[Region]] = None) -> list[Region]:
         """
         :param pattern: The regex or literal pattern to search by.
         :param flags: Controls various behaviors of find. See `FindFlags`.
@@ -2872,12 +2876,20 @@ class View:
                        will be formatted with the provided format string.
         :param extractions: An optionally provided list to place the contents of
                             the find results into.
+        :param within:
+            When not ``None`` searching is limited to within the provided
+            region(s). :since:`4181`
         :returns: All (non-overlapping) regions matching the pattern.
         """
+        if isinstance(within, Region):
+            within = [within]
+
         if fmt is None:
-            return sublime_api.view_find_all(self.view_id, pattern, flags)
+            return sublime_api.view_find_all(
+                self.view_id, pattern, flags, within)
         else:
-            results = sublime_api.view_find_all_with_contents(self.view_id, pattern, flags, fmt)
+            results = sublime_api.view_find_all_with_contents(
+                self.view_id, pattern, flags, fmt, within)
             ret = []
             for region, contents in results:
                 ret.append(region)
@@ -3362,7 +3374,7 @@ class View:
             An optional string of the CSS color to use when drawing the left
             border of the annotation. See :ref:`minihtml Reference: Colors
             <minihtml:CSS:Colors>` for supported color formats. :since:`4050`
-        :param on_navitate:
+        :param on_navigate:
             Called when a link in an annotation is clicked. Will be passed the
             ``href`` of the link. :since:`4050`
         :param on_close:
@@ -3817,6 +3829,7 @@ class Settings:
             self[key] = value
 
     def get(self, key: str, default: Value = None) -> Value:
+        """ Same as `__getitem__`. """
         if default is not None:
             return sublime_api.settings_get_default(self.settings_id, key, default)
         else:
@@ -3996,25 +4009,28 @@ class CompletionList:
     def __repr__(self) -> str:
         return f'CompletionList(completions={self.completions!r}, flags={self.flags!r})'
 
-    def _set_target(self, target):
-        if self.completions is not None:
-            target.completions_ready(self.completions, self.flags)
-        else:
-            self.target = target
-
     def set_completions(self, completions: list[CompletionValue], flags=AutoCompleteFlags.NONE):
         """
         Sets the list of completions, allowing the list to be displayed to the
         user.
+
+        .. since:: 4184
+
+            This function is thread-safe. If you're generating a lot of
+            completions you're encouraged to call this function from a
+            background thread to avoid blocking the UI.
         """
         assert self.completions is None
         assert flags is not None
 
-        self.completions = completions
+        # This may be called from another thread. Ordering is important to avoid
+        # data races. See MultiCompletionList_append.
         self.flags = flags
+        self.completions = completions
 
-        if self.target is not None:
-            self.target.completions_ready(completions, flags)
+        target = self.target  # atomic load
+        if target is not None:
+            target.completions_ready(completions, flags)
 
 
 class CompletionItem:

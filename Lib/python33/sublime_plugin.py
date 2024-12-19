@@ -968,77 +968,26 @@ def split_trigger(trigger):
         return (trigger[0:idx], trigger[idx + 1:])
 
 
-def normalise_completion(c):
-    if isinstance(c, str):
-        trigger, annotation = split_trigger(c)
-        return sublime.CompletionItem(trigger, annotation)
-    elif len(c) == 1:
-        trigger, annotation = split_trigger(c[0])
-        return sublime.CompletionItem(trigger, annotation)
-    elif len(c) == 2:
-        trigger, annotation = split_trigger(c[0])
-        return sublime.CompletionItem.snippet_completion(
-            trigger,
-            c[1],
-            annotation,
-            kind=sublime.KIND_AMBIGUOUS
-        )
-    elif len(c) == 3:
-        trigger, annotation = split_trigger(c[0])
-        return sublime.CompletionItem.snippet_completion(
-            trigger,
-            c[2],
-            annotation,
-            kind=sublime.KIND_AMBIGUOUS
-        )
-    else:
-        return sublime.CompletionItem("")
-
-
-class MultiCompletionList():
-    def __init__(self, num_completion_lists, view_id, req_id):
-        self.remaining_calls = num_completion_lists
-        self.view_id = view_id
-        self.req_id = req_id
-        self.completions = []
-        self.flags = 0
-
-    def completions_ready(self, completions, flags):
-        self.completions += [c if isinstance(c, sublime.CompletionItem) else normalise_completion(c)
-                             for c in completions]
-        self.flags |= flags
-        self.remaining_calls -= 1
-
-        if self.remaining_calls == 0:
-            sublime_api.view_set_completions(
-                self.view_id, self.req_id, (self.completions, self.flags))
-
-
 def on_query_completions(view_id, req_id, prefix, locations):
     v = sublime.View(view_id)
 
-    completion_lists = []
+    mlist = sublime_api.MultiCompletionList(view_id, req_id)
 
     def norm_res(res):
         if isinstance(res, tuple):
-            completion_lists.append(sublime.CompletionList(res[0], flags=res[1]))
+            return sublime.CompletionList(res[0], flags=res[1])
         elif isinstance(res, list):
-            completion_lists.append(sublime.CompletionList(res))
+            return sublime.CompletionList(res)
         elif isinstance(res, sublime.CompletionList):
-            completion_lists.append(res)
+            return res
 
     for callback in el_callbacks('on_query_completions'):
-        norm_res(callback(v, prefix, locations))
+        mlist.append(norm_res(callback(v, prefix, locations)))
 
     for callback in vel_callbacks(v, 'on_query_completions'):
-        norm_res(callback(prefix, locations))
+        mlist.append(norm_res(callback(prefix, locations)))
 
-    if not completion_lists:
-        completion_lists = [sublime.CompletionList([])]
-
-    mlist = MultiCompletionList(len(completion_lists), view_id, req_id)
-    for cl in completion_lists:
-        cl._set_target(mlist)
+    mlist.ready()
 
 
 def on_hover(view_id, point, hover_zone):

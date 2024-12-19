@@ -1411,11 +1411,14 @@ class View():
     def find(self, pattern, start_pt, flags=0):
         return sublime_api.view_find(self.view_id, pattern, start_pt, flags)
 
-    def find_all(self, pattern, flags=0, fmt=None, extractions=None):
+    def find_all(self, pattern, flags=0, fmt=None, extractions=None, within=None):
+        if isinstance(within, Region):
+            within = [within]
+
         if fmt is None:
-            return sublime_api.view_find_all(self.view_id, pattern, flags)
+            return sublime_api.view_find_all(self.view_id, pattern, flags, within)
         else:
-            results = sublime_api.view_find_all_with_contents(self.view_id, pattern, flags, fmt)
+            results = sublime_api.view_find_all_with_contents(self.view_id, pattern, flags, fmt, within)
             ret = []
             for region, contents in results:
                 ret.append(region)
@@ -1979,21 +1982,18 @@ class CompletionList:
             repr(self.flags)
         )
 
-    def _set_target(self, target):
-        if self.completions is not None:
-            target.completions_ready(self.completions, self.flags)
-        else:
-            self.target = target
-
     def set_completions(self, completions, flags=0):
         assert self.completions is None
         assert flags is not None
 
-        self.completions = completions
+        # This may be called from another thread. Ordering is important to avoid
+        # data races. See MultiCompletionList_append.
         self.flags = flags
+        self.completions = completions
 
-        if self.target is not None:
-            self.target.completions_ready(completions, flags)
+        target = self.target  # atomic load
+        if target is not None:
+            target.completions_ready(completions, flags)
 
 
 class CompletionItem:
