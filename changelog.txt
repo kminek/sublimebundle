@@ -59,6 +59,29 @@ html.dark tt {
 <h1>Stable Channel Changelog</h1>
 
 <article class="current">
+<h2>Build 4192</h2>
+<div class="release-date">20 Jan 2024</div>
+<ul>
+    <li>Fixed tab not working when tab completion is disabled and there is no matching snippet</li>
+    <li>Fixed find field not expanding with multi-line search queries</li>
+    <li>Fixed a scroll position tracking issue</li>
+    <li>Windows: Fixed an issue with timer accuracy</li>
+</ul>
+</article>
+
+<article>
+<h2>Build 4189</h2>
+<div class="release-date">20 Dec 2024</div>
+<ul>
+    <li>Fixed a performance regression when editing large files</li>
+    <li>Fixed laggy window resizing regression when text wrap is turned off</li>
+    <li>Fixed incorrect scroll extents when using fractional scaling</li>
+    <li>Fixed symbol icons missing in some cases</li>
+    <li>Fixed <tt>find_under_expand_skip</tt> clearing the selection when there's only one occurrence</li>
+</ul>
+</article>
+
+<article>
 <h2>Build 4186</h2>
 <div class="release-date">17 Dec 2024</div>
 <ul>
