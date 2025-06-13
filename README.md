@@ -30,18 +30,20 @@ directories by double-clicking file `install_context_menu_shortcuts.reg`.
 
 ## What's included
 
-- Sublime Text Version ***4***, Build ***4143***
+- Sublime Text Portable (latest build)
 
 ### Packages
 
 ```
 "A File Icon",
-"DotENV",
 "Dockerfile Syntax Highlighting",
+"DotENV",
 "EditorConfig",
 "INI",
+"Laravel Blade",
 "nginx",
+"Package Control",
 "SideBarEnhancements",
 "Terraform",
-"Theme - Soda"
+"Theme - Soda",
 ```
